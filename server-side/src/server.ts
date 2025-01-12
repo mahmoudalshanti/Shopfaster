@@ -12,6 +12,7 @@ import couponRouter from "./routes/coupon";
 import orderRouter from "./routes/order";
 import corsOptions from "./config/corsOptions";
 import cors from "cors";
+import path from "path";
 
 dotenv.config();
 connectDB();
@@ -29,6 +30,14 @@ app.use("/coupon", couponRouter);
 app.use("/payment", paymentRouter);
 app.use("/analytics", analyticsRouter);
 app.use("/order", orderRouter);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "/client-side/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client-side", "dist", "index.html"));
+  });
+}
 
 mongoose.connection.once("open", () => {
   console.log("Access to DB Success");
